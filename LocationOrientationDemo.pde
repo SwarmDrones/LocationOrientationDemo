@@ -74,7 +74,7 @@ void setup()
 
 void draw()
 {
-  background(100,100,100);
+  background(255,255,255);
   
   
   showCopter();
@@ -104,7 +104,7 @@ void showGrid()
   pushMatrix();
   noStroke();
   //stroke(51,38,29);
-  fill(68,169,10);
+  fill(68,169,10,80);
   //translate(w/2, h/2, -h);
   rotateX(0);
   rotateY(0);
@@ -132,19 +132,15 @@ void showCopter()
   pushMatrix();
   stroke(0);
   // Simple 3 point lighting
-  pointLight(255, 200, 200,  400, 400,  500);//pointLight(200, 200, 255, -400, 400,  500);//pointLight(255, 255, 255,    0,   0, -500);
+  pointLight(255, 200, 200,  400, 400,  500);
+  pointLight(255, 200, 255, w, h,  0);
+  pointLight(255, 255, 255,    -500,   -500, -500);
   
   translate((w/2)+locX, (h/2)+locY, h/1000);
   
   rotateX(0);
   rotateY(0);
   rotateZ(0);
-  //rotateZ(radians((float)roll));
-  //rotateX(radians((float)pitch));
-  //rotateY(radians((float)yaw));
-  //rotateZ(radians(roll));
-  //rotateX(radians(yaw));
-  //rotateY(radians(pitch));
   rotateZ(radians(yaw));
   rotateX(radians(pitch));
   rotateY(radians(roll));
