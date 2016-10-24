@@ -192,8 +192,8 @@ void serialEvent(Serial p)
     }
     if ( (list.length > 0) && (list[0].equals("Location:")) ) 
     {
-      locX  = float(list[1]); 
-      locY = float(list[2]); 
+      locX  = 10*float(list[1]); 
+      locY = 10*float(list[2]); 
       surfaceQuality= float(list[3]); 
     }
     
