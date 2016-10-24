@@ -75,11 +75,14 @@ void setup()
 void draw()
 {
   background(100,100,100);
-
+  
+  
   showCopter();
   showGrid();
-  //popMatrix();
-  //print("draw");
+  fill(0, 102, 153);
+  String s = "Surface Quality: " + (surfaceQuality) + "\n" + "X: " + locX + "\n" + "Y: " + locY;
+  textSize(18);
+  text(s, locX+(w/2)+50, locY +(h/2));
 }
 void showGrid()
 {
@@ -98,6 +101,7 @@ void showGrid()
     }
     yOff += 0.06;
   }*/
+  pushMatrix();
   noStroke();
   //stroke(51,38,29);
   fill(68,169,10);
@@ -118,6 +122,7 @@ void showGrid()
     }
     endShape();
   }
+  popMatrix();
 }
 
 
@@ -126,19 +131,11 @@ void showCopter()
   // Set a new co-ordinate space
   pushMatrix();
   stroke(0);
-  // Simple 3 point lighting for dramatic effect.
-  // Slightly red light in upper right, slightly blue light in upper left, and white light from behind.
-  pointLight(255, 200, 200,  400, 400,  500);
-  //pointLight(200, 200, 255, -400, 400,  500);
-  //pointLight(255, 255, 255,    0,   0, -500);
+  // Simple 3 point lighting
+  pointLight(255, 200, 200,  400, 400,  500);//pointLight(200, 200, 255, -400, 400,  500);//pointLight(255, 255, 255,    0,   0, -500);
   
-  // Move bunny from 0,0 in upper left corner to roughly center of screen.
-  //translate(width/2, height/2, 0);
   translate((w/2)+locX, (h/2)+locY, h/1000);
   
-  // Rotate shapes around the X/Y/Z axis (values in radians, 0..Pi*2)
-  //top view rotations
-  // Rotate shapes around the X/Y/Z axis (values in radians, 0..Pi*2)
   rotateX(0);
   rotateY(0);
   rotateZ(0);
@@ -156,34 +153,27 @@ void showCopter()
   
   fill(255,0,0);
   box(5,5,100);    
-  pushMatrix();
-  //translate(0, 50, 0);
+  //pushMatrix();
   
   sphere(10);
-  popMatrix();
+  //popMatrix();
  
   fill(0,255,0);
   box(100,10,10);
-  pushMatrix();
-  //translate(50, 0, 0); 
-  //rotateX(PI/2);
+  //pushMatrix();
   ellipse(50, 0, 30, 30);
   ellipse(-50, 0, 30, 30);
   sphere(10);
-  //rotateX(0);
   
-  popMatrix();
+  //popMatrix();
  
   fill(0,0,255);
   box(10,100,10);
-  pushMatrix();
-  //translate(0, 0, 50); 
-  //rotateX(PI/2);
+  //pushMatrix();
   ellipse(0, 50, 30, 30);
   ellipse(0, -50, 30, 30);
   sphere(10);
-  //rotateX(0);
-  popMatrix();
+  //popMatrix();
   
   popMatrix();
   
