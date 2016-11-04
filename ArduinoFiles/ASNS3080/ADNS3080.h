@@ -7,6 +7,12 @@
 #define CPE810_CPP_ADNS3080_H
 
 #include <SPI.h>
+// field of view of ADNS3080 sensor lenses
+#define AP_OPTICALFLOW_ADNS3080_08_FOV 0.202458f        // 11.6 degrees
+
+// scaler - value returned when sensor is moved equivalent of 1 pixel
+#define AP_OPTICALFLOW_ADNS3080_SCALER_400   1.1f       // when resolution set to 400
+#define AP_OPTICALFLOW_ADNS3080_SCALER_1600  4.4f       // when resolution set to 1600
 
 // ADNS3080 hardware config
 #define ADNS3080_PIXELS_X                 30
@@ -72,6 +78,8 @@ public:
         //SS_PIN = ssPin;
         x = 0;
         y = 0;
+        conv_factor = 0.0F;
+        radians_to_pixels = 0.0F;
     }
     void updateLocation()
     {
@@ -102,6 +110,7 @@ public:
         
         uint8_t config = spiRead(ADNS3080_CONFIGURATION_BITS);
         spiWrite(ADNS3080_CONFIGURATION_BITS, config | 0x10); // Set resolution to 1600 counts per inch
+        update_conversion_factors();
     }
     int32_t getX()
     {
@@ -117,6 +126,8 @@ private:
     int32_t y;
     const uint8_t RESET_PIN = 9;
     const uint8_t SS_PIN = 10;
+    float conv_factor;
+    float radians_to_pixels;
     
     void printPixelData(void)
     {
@@ -168,11 +179,15 @@ private:
             x += dx;
             y += dy;
             Serial.print(F("Location: "));
-            Serial.print(x);
-            Serial.print(F(" "));
-            Serial.print(y);
-            Serial.print(F(" "));
+            //Serial.print(x);
+            //Serial.print(F(" "));
+            //Serial.print(y);
+            //Serial.print(F(" "));
             Serial.print(surfaceQuality);
+            Serial.print(F(" "));
+            Serial.print(dx);
+            Serial.print(F(" "));
+            Serial.print(dy);
             Serial.println(F(" "));
             
             // Print values
@@ -243,6 +258,18 @@ private:
         
         digitalWrite(SS_PIN, HIGH);
         SPI.endTransaction();
+    }
+    
+    // updates conversion factors that are dependent upon field_of_view
+    void update_conversion_factors()
+    {
+        // multiply this number by altitude and pixel change to get horizontal
+        // move (in same units as altitude)
+        conv_factor = ((1.0f / (float)(ADNS3080_PIXELS_X * AP_OPTICALFLOW_ADNS3080_SCALER_1600))
+                       * 2.0f * tanf(AP_OPTICALFLOW_ADNS3080_08_FOV / 2.0f));
+        // 0.00615
+        radians_to_pixels = (ADNS3080_PIXELS_X * AP_OPTICALFLOW_ADNS3080_SCALER_1600) / AP_OPTICALFLOW_ADNS3080_08_FOV;
+        // 162.99
     }
     
 };

@@ -21,6 +21,15 @@
 double ct = 0.00;
 double pt = 0.00;
 double dt = 0.00;
+
+double alt_cm = 0.00;
+double roll = 0.00, pitch = 0.00, yaw = 0.00;
+double droll = 0.00, dpitch = 0.00, dyaw = 0.00;
+double proll = 0.00, ppitch = 0.00, pyaw = 0.00;
+double x_cm = 0.00, y_cm = 0.00;    // 
+double dx_cm = 0.00, dy_cm = 0.00;  // displacement
+double px_cm = 0.00, py_cm = 0.00;  // previous values
+double ix_cm = 0.00, iy_cm = 0.00;  // integral
 /* Set the delay between fresh samples */
 #define BNO055_SAMPLERATE_DELAY_MS (100)
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
@@ -52,19 +61,69 @@ void printOrientation(sensors_event_t &event)
   Serial.println(F(" "));
 
   /* The processing sketch expects data as roll, pitch, heading */
+  proll = roll;
+  ppitch = pitch;
+  pyaw = yaw;
+  roll = event.orientation.z;
+  pitch = event.orientation.y;
+  yaw = event.orientation.x;
+  droll = roll - proll;
+  dpitch = pitch - ppitch;
+  dyaw = yaw - pyaw;
+  
   Serial.print(F("Orientation: "));
-  Serial.print((double)event.orientation.x);
+  Serial.print((double)yaw);
   Serial.print(F(" "));
-  Serial.print((double)event.orientation.y);
+  Serial.print((double)pitch);
   Serial.print(F(" "));
-  Serial.print((double)event.orientation.z);
+  Serial.print((double)roll);
   Serial.println(F(""));
 }
+
+/*
+ * Lidar  Functions
+ */
+ void lidarSetup()
+ {
+    pinMode(2, OUTPUT); // Set pin 2 as trigger pin
+    pinMode(3, INPUT); // Set pin 3 as monitor pin
+    digitalWrite(2, LOW); // Set trigger LOW for continuous read
+ }
+
+ void getAlt_cm()
+ {
+    double pulse_width = pulseIn(3, HIGH); // Count how long the pulse is high in microseconds
+    if(pulse_width != 0)
+    { // If we get a reading that isn't zero, let's print it
+      alt_cm = pulse_width/10; // 10usec = 1 cm of distance for LIDAR-Lite
+      px_cm = x_cm;
+      py_cm = y_cm;
+      
+      x_cm = alt_cm*sin(radians(roll));
+      y_cm = alt_cm*sin(radians(pitch));
+    
+      dx_cm = alt_cm*sin(radians(droll));//x_xm - px_cm;
+      dy_cm = alt_cm*sin(radians(dpitch));//y_cm - py_cm;
+    
+      ix_cm += dx_cm;
+      iy_cm += dy_cm;
+      
+      Serial.print(F("Alt: "));
+      Serial.print((double)alt_cm);
+      Serial.print(F(" "));
+      Serial.print((double)dx_cm);
+      Serial.print(F(" "));
+      Serial.print((double)dy_cm);
+      Serial.println(F(""));
+    }
+ }
+ 
 /*
  *  ADNS3080 object
  */
 
 myADNS3080 moFlow;// lol
+
 
 void setup()
 {
@@ -86,6 +145,12 @@ void setup()
    * THE OPTICAL FLOW SENSOR SETUP
    *****************************************************************************/
   moFlow.setup();
+  
+  /******************************************************************************
+   * THE Lidar lite SENSOR SETUP
+   *****************************************************************************/
+  lidarSetup();
+  
 }
 
 void loop()
@@ -105,6 +170,13 @@ void loop()
 ////////////////////////////////////////////////////////////////////// 
   /* Location from ADNS3080 sensor */
   moFlow.updateLocation();
+
+//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////// 
+  /* altitude measurement */
+  getAlt_cm();
+
+  
   
 }
 
