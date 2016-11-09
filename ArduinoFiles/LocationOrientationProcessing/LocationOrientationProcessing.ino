@@ -53,12 +53,7 @@ void displaySensorDetails(void)
 void printOrientation(sensors_event_t &event)
 {
   Serial.print(F("DeltaTime: "));
-  Serial.print((double)dt);
-  Serial.print(F(" "));
-  Serial.print((double)dt);
-  Serial.print(F(" "));
-  Serial.print((double)dt);
-  Serial.println(F(" "));
+  Serial.println((double)dt);
 
   /* The processing sketch expects data as roll, pitch, heading */
   proll = roll;
